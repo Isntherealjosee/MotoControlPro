@@ -22,7 +22,8 @@
         
         <section class="form-section">
             <div class="login-box" style="margin: 0; max-width: 600px;">
-                <form action="{{ url_for('nueva_moto') }}" method="POST">
+        <!-- ¡CRUCIAL! enctype="multipart/form-data" es lo que permite que el HTML envíe archivos (bytes) además de texto -->
+                <form action="{{ url_for('nueva_moto') }}" method="POST" enctype="multipart/form-data">
                     
                     <div style="display: flex; gap: 15px;">
                         <div class="input-group" style="flex: 1;">
@@ -51,6 +52,12 @@
                     <div class="input-group">
                         <label for="kilometraje_actual">Kilometraje Actual (km):</label>
                         <input type="number" id="kilometraje_actual" name="kilometraje_actual" required placeholder="Ej. 15000" min="0">
+                    </div>
+
+                    <!-- NUEVO CAMPO PARA LA FOTO (Mantiene la paleta de colores de tu CSS) -->
+                    <div class="input-group" style="margin-top: 15px;">
+                        <label for="foto">Fotografía de la Motocicleta (Opcional):</label>
+                        <input type="file" id="foto" name="foto" accept=".jpg, .jpeg, .png, .webp" style="width: 100%; padding: 10px; background-color: #1e1e24; color: var(--text-muted); border: 1px dashed #3f3f4e; border-radius: 6px; cursor: pointer; outline: none;">
                     </div>
 
                     <div style="display: flex; gap: 15px; margin-top: 30px;">
