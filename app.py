@@ -119,6 +119,64 @@ def dashboard():
         return redirect(url_for('inicio'))
 
 # --- RUTA: REGISTRAR NUEVO MANTENIMIENTO (CORREGIDA) ---
+# --- RUTA: ANÁLISIS FINANCIERO ---
+@app.route('/finanzas')
+def finanzas():
+    if 'id_usuario' not in session:
+        return redirect(url_for('inicio'))
+
+    conexion = None
+    try:
+        conexion = mysql.connector.connect(**DB_CONFIG)
+        cursor = conexion.cursor(dictionary=True)
+
+        cursor.execute("SELECT id_moto, marca, modelo, kilometraje_actual FROM motocicletas WHERE id_usuario = %s", (session['id_usuario'],))
+        motos = cursor.fetchall()
+
+        estadisticas = None
+        datos_grafica = []
+        moto_actual = None
+
+        if motos:
+            moto_id = request.args.get('moto_id')
+            if not moto_id:
+                moto_id = motos[0]['id_moto']
+            
+            moto_actual = next((m for m in motos if str(m['id_moto']) == str(moto_id)), motos[0])
+
+            cursor.execute("SELECT SUM(costo) as total FROM mantenimientos WHERE id_moto = %s", (moto_id,))
+            resultado_total = cursor.fetchone()
+            total_gastado = resultado_total['total'] if resultado_total['total'] else 0
+
+            costo_por_km = 0
+            if moto_actual['kilometraje_actual'] > 0:
+                costo_por_km = float(total_gastado) / float(moto_actual['kilometraje_actual'])
+
+            cursor.execute("SELECT tipo_servicio, SUM(costo) as total FROM mantenimientos WHERE id_moto = %s GROUP BY tipo_servicio", (moto_id,))
+            datos_crudos = cursor.fetchall()
+
+            datos_grafica = []
+            for item in datos_crudos:
+                datos_grafica.append({
+                    'tipo_servicio': item['tipo_servicio'],
+                    'total': float(item['total'])
+                })
+
+            estadisticas = {
+                'total_gastado': float(total_gastado),
+                'costo_por_km': costo_por_km
+            }
+
+        return render_template('finanzas.html', motos=motos, moto_actual=moto_actual, estadisticas=estadisticas, datos_grafica=datos_grafica)
+
+    except mysql.connector.Error as e:
+        flash(f'Error de base de datos: {e}', 'error')
+        return redirect(url_for('dashboard'))
+    finally:
+        if conexion and conexion.is_connected():
+            cursor.close()
+            conexion.close()
+
 @app.route('/moto/<int:id_moto>/mantenimiento/nuevo', methods=['GET', 'POST'])
 def nuevo_mantenimiento(id_moto):
     if 'id_usuario' not in session:
