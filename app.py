@@ -1,3 +1,7 @@
+import requests
+import os
+
+import requests
 import os
 import uuid
 from werkzeug.utils import secure_filename
@@ -9,17 +13,26 @@ from config import DB_CONFIG
 app = Flask(__name__)
 app.secret_key = 'llave_super_secreta_motocontrol'
 
+# Función para enviar notificaciones usando variables de entorno
+def enviar_telegram(mensaje):
+    token = os.environ.get('TELEGRAM_TOKEN')
+    chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+    
+    if token and chat_id:
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        params = {'chat_id': chat_id, 'text': mensaje}
+        try:
+            requests.get(url, params=params)
+        except Exception as e:
+            print(f"Error enviando Telegram: {e}")
+
 # --- CONFIGURACIÓN DE SUBIDA DE IMÁGENES ---
-# Le decimos a Flask exactamente dónde guardar las fotos
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Límite de seguridad: Solo permitimos estas extensiones de imagen
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-# -------------------------------------------
 
 # --- RUTA 1: INICIO DE SESIÓN (AHORA ES LA RAÍZ DIRECTA) ---
 @app.route('/', methods=['GET', 'POST'])
@@ -266,7 +279,16 @@ def nuevo_mantenimiento(id_moto):
                 cursor.execute(sql_actualizar_km, (kilometraje_servicio, id_moto))
 
             conexion.commit()
+            # ... (código anterior)
+            conexion.commit()
             
+            # --- NOTIFICACIÓN TELEGRAM ---
+            mensaje = f"✅ Mantenimiento registrado: {tipo_servicio} en {moto['marca']} {moto['modelo']}."
+            enviar_telegram(mensaje)
+            # -----------------------------
+            
+            flash('Mantenimiento registrado correctamente.', 'success')
+            return redirect(url_for('detalle_moto', id_moto=id_moto))
             flash('Mantenimiento registrado correctamente.', 'success')
             return redirect(url_for('detalle_moto', id_moto=id_moto))
 
