@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Análisis Financiero - MotoControl Pro{% endblock %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">MotoControl <span>Pro</span></div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}">Mi Garaje</a>
+            <a href="{{ url_for('finanzas') }}" class="active">Finanzas</a>
+        </nav>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Cerrar Sesión</a>
+    </aside>
+
+    <div class="main-content">
+        <header class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Análisis Financiero</h2>
+            
+            {% if motos %}
+            <form action="{{ url_for('finanzas') }}" method="GET" style="display: flex; gap: 10px; align-items: center;">
+                <label for="moto_id" style="color: var(--text-muted);">Selecciona Moto:</label>
+                <select name="moto_id" id="moto_id" onchange="this.form.submit()" style="padding: 8px; border-radius: 6px; background-color: var(--box-color); color: white; border: 1px solid #3f3f4e;">
+                    {% for m in motos %}
+                        <option value="{{ m.id_moto }}" {% if moto_actual.id_moto|string == m.id_moto|string %}selected{% endif %}>
+                            {{ m.marca }} {{ m.modelo }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+            {% endif %}
+        </header>
+        
+        {% if motos and estadisticas %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="moto-card" style="text-align: center;">
+                    <p style="color: var(--text-muted); margin-bottom: 10px;">Gasto Total Acumulado</p>
+                    <h3 style="color: #198754; font-size: 28px;">${{ "%.2f"|format(estadisticas.total_gastado) }}</h3>
+                </div>
+                
+                <div class="moto-card" style="text-align: center;">
+                    <p style="color: var(--text-muted); margin-bottom: 10px;">Costo de Mantenimiento por Km</p>
+                    <h3 style="color: var(--accent-color); font-size: 28px;">${{ "%.2f"|format(estadisticas.costo_por_km) }}</h3>
+                </div>
+            </div>
+
+            <div class="moto-card">
+                <h3 style="margin-bottom: 20px;">Distribución de Gastos</h3>
+                <div style="height: 300px; display: flex; justify-content: center;">
+                    <canvas id="gastosChart"></canvas>
+                </div>
+            </div>
+
+            <script>
+                // Agregamos "| safe" para que Flask no destruya las comillas del texto
+                const datosGrafica = {{ datos_grafica | tojson | safe }};
+                
+                const etiquetas = datosGrafica.map(item => item.tipo_servicio);
+                const valores = datosGrafica.map(item => item.total);
+
+                const ctx = document.getElementById('gastosChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: etiquetas,
+                        datasets: [{
+                            data: valores,
+                            backgroundColor: [
+                                '#ff6b00', '#198754', '#0d6efd', '#dc3545', '#ffc107', '#6f42c1'
+                            ],
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'right', labels: { color: '#ffffff' } }
+                        }
+                    }
+                });
+            </script>
+        {% else %}
+            <div class="empty-state">
+                <p>No hay datos financieros disponibles. Registra una motocicleta y añade servicios para ver estadísticas.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

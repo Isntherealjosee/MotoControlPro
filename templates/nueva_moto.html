@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Moto - MotoControl Pro{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">MotoControl <span>Pro</span></div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}" class="active">Mi Garaje</a>
+            <a href="#">Mantenimientos</a>
+            <a href="#">Finanzas</a>
+        </nav>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Cerrar Sesión</a>
+    </aside>
+
+    <div class="main-content">
+        <header class="dashboard-header">
+            <h2>Registrar Nueva Motocicleta</h2>
+            <p style="color: var(--text-muted); margin-top: 5px;">Ingresa los datos de tu vehículo para comenzar a llevar su control.</p>
+        </header>
+        
+        <section class="form-section">
+            <div class="login-box" style="margin: 0; max-width: 600px;">
+                <form action="{{ url_for('nueva_moto') }}" method="POST">
+                    
+                    <div style="display: flex; gap: 15px;">
+                        <div class="input-group" style="flex: 1;">
+                            <label for="marca">Marca:</label>
+                            <input type="text" id="marca" name="marca" required placeholder="Ej. Yamaha, Honda, Vento">
+                        </div>
+                        
+                        <div class="input-group" style="flex: 1;">
+                            <label for="modelo">Modelo:</label>
+                            <input type="text" id="modelo" name="modelo" required placeholder="Ej. FZ 2.0, CBR250">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <div class="input-group" style="flex: 1;">
+                            <label for="anio">Año:</label>
+                            <input type="number" id="anio" name="anio" required placeholder="Ej. 2022" min="1950" max="2030">
+                        </div>
+                        
+                        <div class="input-group" style="flex: 1;">
+                            <label for="cilindrada">Cilindrada (cc):</label>
+                            <input type="number" id="cilindrada" name="cilindrada" required placeholder="Ej. 250" min="50" max="2500">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="kilometraje_actual">Kilometraje Actual (km):</label>
+                        <input type="number" id="kilometraje_actual" name="kilometraje_actual" required placeholder="Ej. 15000" min="0">
+                    </div>
+
+                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                        <a href="{{ url_for('dashboard') }}" class="btn-primary" style="background-color: transparent; border: 1px solid #3f3f4e; text-align: center; text-decoration: none;">Cancelar</a>
+                        <button type="submit" class="btn-primary" style="margin-top: 0;">Guardar Motocicleta</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

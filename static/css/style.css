@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+:root {
+    --bg-color: #1e1e24;
+    --box-color: #2b2b36;
+    --accent-color: #ff6b00;
+    --accent-hover: #e66000;
+    --text-main: #ffffff;
+    --text-muted: #a0a0ab;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    /* Quitamos el centrado de aquí para que el dashboard pueda usar toda la pantalla */
+}
+
+/* 1. ESTILOS DE LOGIN Y ALERTAS */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* El centrado ahora vive solo en el login */
+}
+
+.login-box {
+    background-color: var(--box-color);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.logo { font-size: 28px; margin-bottom: 5px; }
+.logo span { color: var(--accent-color); }
+.login-box h2 { color: var(--text-muted); font-size: 16px; margin-bottom: 30px; font-weight: 400; }
+
+.input-group { text-align: left; margin-bottom: 20px; }
+.input-group label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-muted); }
+.input-group input { width: 100%; padding: 12px; border: 1px solid #3f3f4e; background-color: #1e1e24; color: var(--text-main); border-radius: 6px; outline: none; transition: 0.3s; }
+.input-group input:focus { border-color: var(--accent-color); }
+
+.btn-primary { width: 100%; padding: 14px; background-color: var(--accent-color); color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+.btn-primary:hover { background-color: var(--accent-hover); }
+
+.register-link { margin-top: 25px; font-size: 14px; color: var(--text-muted); }
+.register-link a { color: var(--accent-color); text-decoration: none; font-weight: 600; }
+.register-link a:hover { text-decoration: underline; }
+
+.alert-container { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; z-index: 1000; }
+.alert { padding: 15px; border-radius: 8px; margin-bottom: 10px; text-align: center; font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+.alert-success { background-color: #198754; color: white; }
+.alert-error { background-color: #dc3545; color: white; }
+
+/* 2. ESTILOS DEL DASHBOARD (NUEVO) */
+.dashboard-layout { display: flex; height: 100vh; width: 100vw; }
+
+.sidebar { width: 250px; background-color: var(--box-color); padding: 30px 20px; display: flex; flex-direction: column; border-right: 1px solid #3f3f4e; }
+.sidebar-brand { font-size: 24px; font-weight: 700; margin-bottom: 40px; text-align: center; }
+.sidebar-brand span { color: var(--accent-color); }
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
+.sidebar-nav a { color: var(--text-muted); text-decoration: none; padding: 12px 15px; border-radius: 8px; transition: 0.3s; }
+.sidebar-nav a:hover, .sidebar-nav a.active { background-color: #1e1e24; color: var(--accent-color); font-weight: 600; }
+
+.logout-btn { color: #dc3545; text-decoration: none; padding: 12px 15px; text-align: center; border-top: 1px solid #3f3f4e; margin-top: 20px; transition: 0.3s; font-weight: 600; }
+.logout-btn:hover { color: #ff4d4d; }
+
+.main-content { flex-grow: 1; padding: 40px; overflow-y: auto; }
+.dashboard-header { border-bottom: 1px solid #3f3f4e; padding-bottom: 20px; margin-bottom: 30px; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
+.btn-small { width: auto; padding: 10px 20px; margin-top: 0; }
+
+.empty-state { background-color: var(--box-color); padding: 50px; text-align: center; border-radius: 12px; color: var(--text-muted); border: 1px dashed #3f3f4e; }
+/* Estilos para el catálogo de Motocicletas */
+.motos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.moto-card {
+    background-color: var(--box-color);
+    border: 1px solid #3f3f4e;
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.moto-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    border-color: var(--accent-color);
+}
+
+.moto-info h4 {
+    font-size: 20px;
+    color: var(--text-main);
+    margin-bottom: 5px;
+}
+
+.moto-year {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.moto-km {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.moto-actions {
+    border-top: 1px solid #3f3f4e;
+    padding-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--text-main);
+    border: 1px solid #3f3f4e;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+/* Estilos para el Historial de Servicios */
+.service-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.service-item {
+    background-color: var(--box-color);
+    padding: 15px 20px;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.service-info h4 {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: var(--text-main);
+}
+
+.service-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.service-cost {
+    font-size: 18px;
+    font-weight: 700;
+    color: #198754; /* Verde para indicar dinero */
+}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Garaje - MotoControl Pro{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">MotoControl <span>Pro</span></div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}" class="active">Mi Garaje</a>
+            <a href="{{ url_for('finanzas') }}">Finanzas</a>
+        </nav>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Cerrar Sesión</a>
+    </aside>
+
+    <div class="main-content">
+        <header class="dashboard-header">
+            <h2>¡Hola, {{ session['nombre'] }}!</h2>
+        </header>
+        
+        <section class="garage-section">
+            <div class="section-header">
+                <h3>Tus Motocicletas</h3>
+                <a href="{{ url_for('nueva_moto') }}" class="btn-primary btn-small" style="text-decoration: none; display: inline-block;">+ Registrar Moto</a>
+            </div>
+            
+            {% if motos %}
+                <div class="motos-grid">
+                    {% for moto in motos %}
+                    <div class="moto-card">
+                        <div class="moto-info">
+                            <h4>{{ moto.marca }} {{ moto.modelo }}</h4>
+                            <p class="moto-year">{{ moto.anio }} • {{ moto.cilindrada }}cc</p>
+                            <p class="moto-km">Kilometraje: {{ moto.kilometraje_actual }} km</p>
+                        </div>
+                        <div class="moto-actions">
+                            <a href="{{ url_for('detalle_moto', id_moto=moto.id_moto) }}" class="btn-secondary" style="text-decoration: none; text-align: center;">Ver Detalles</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>Aún no tienes motocicletas en tu garaje. ¡Agrega la primera!</p>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

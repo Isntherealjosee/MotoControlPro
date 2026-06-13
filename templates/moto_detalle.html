@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}{{ moto.marca }} {{ moto.modelo }} - MotoControl Pro{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">MotoControl <span>Pro</span></div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}">Volver al Garaje</a>
+            <a href="#" class="active">Detalles de Moto</a>
+        </nav>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Cerrar Sesión</a>
+    </aside>
+
+    <div class="main-content">
+        <header class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2>{{ moto.marca }} {{ moto.modelo }} ({{ moto.anio }})</h2>
+                <p style="color: var(--text-muted); margin-top: 5px;">Kilometraje actual: <strong style="color: var(--accent-color);">{{ moto.kilometraje_actual }} km</strong></p>
+            </div>
+            <div>
+                <a href="{{ url_for('nuevo_mantenimiento', id_moto=moto.id_moto) }}" class="btn-primary btn-small" style="text-decoration: none; display: inline-block;">+ Registrar Mantenimiento</a>
+            </div>
+        </header>
+        
+   <section class="garage-section">
+            <div class="section-header">
+                <h3>Historial de Servicios</h3>
+            </div>
+            
+            {% if mantenimientos %}
+                <div class="service-list">
+                    {% for m in mantenimientos %}
+                    <div class="service-item">
+                        <div class="service-info">
+                            <h4>{{ m.tipo_servicio }}</h4>
+                            <p class="service-meta">{{ m.fecha_servicio }} | A los {{ m.kilometraje_servicio }} km</p>
+                            {% if m.notas %}
+                                <p class="service-meta" style="margin-top: 5px; font-style: italic;">"{{ m.notas }}"</p>
+                            {% endif %}
+                        </div>
+                        <div class="service-cost">
+                            ${{ "%.2f"|format(m.costo) }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>Aún no hay registros de mantenimiento para esta motocicleta.</p>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}
