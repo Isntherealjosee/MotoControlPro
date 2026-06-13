@@ -67,3 +67,6 @@
     </div>
 </div>
 {% endblock %}
+# ... después de registrar el mantenimiento ...
+mensaje = f"⚠ Mantenimiento registrado: {tipo_servicio} en {moto['marca']} {moto['modelo']}"
+enviar_telegram(mensaje)
