@@ -1,18 +1,11 @@
 import os
-import uuid  # <-- ESTO ES NUEVO
+import uuid
 from werkzeug.utils import secure_filename
-
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
-# --- NUEVAS HERRAMIENTAS PARA SUBIDA DE ARCHIVOS ---
-import os
-from werkzeug.utils import secure_filename
-# ---------------------------------------------------
 import mysql.connector
 from config import DB_CONFIG
 
-app = Flask(__name__)
-app.secret_key = 'llave_super_secreta_motocontrol'
 app = Flask(__name__)
 app.secret_key = 'llave_super_secreta_motocontrol'
 
@@ -24,11 +17,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Límite de seguridad: Solo permitimos estas extensiones de imagen
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
-# Función de seguridad para verificar la extensión del archivo
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 # -------------------------------------------
-# --- RUTA 1: INICIO DE SESIÓN ---
+
+# --- RUTA 1: INICIO DE SESIÓN (AHORA ES LA RAÍZ DIRECTA) ---
 @app.route('/', methods=['GET', 'POST'])
 def inicio():
     if request.method == 'POST':
@@ -93,7 +86,6 @@ def registro():
     return render_template('register.html')
 
 # --- RUTA 3: DASHBOARD (PANEL DE CONTROL) ---
-# --- RUTA 3: DASHBOARD (PANEL DE CONTROL) ---
 @app.route('/dashboard')
 def dashboard():
     if 'id_usuario' in session:
@@ -109,11 +101,10 @@ def dashboard():
             motos = cursor.fetchall()
             
             # 2. MOTOR DE ALERTAS INTELIGENTE
-            # Analizamos matemáticamente cada moto antes de mandarla a la pantalla
             for moto in motos:
-                moto['alertas'] = [] # Creamos una lista vacía para guardar sus avisos
+                moto['alertas'] = []
                 
-                # --- Regla A: Cambio de Aceite (Cada 3000 km) ---
+                # Regla A: Cambio de Aceite
                 sql_aceite = "SELECT kilometraje_servicio FROM mantenimientos WHERE id_moto = %s AND tipo_servicio = 'Cambio de Aceite' ORDER BY fecha_servicio DESC LIMIT 1"
                 cursor.execute(sql_aceite, (moto['id_moto'],))
                 ultimo_aceite = cursor.fetchone()
@@ -127,7 +118,7 @@ def dashboard():
                 else:
                     moto['alertas'].append('⚠ Atención: No hay registro inicial de aceite')
 
-                # --- Regla B: Cadena (Cada 1000 km) ---
+                # Regla B: Cadena
                 sql_cadena = "SELECT kilometraje_servicio FROM mantenimientos WHERE id_moto = %s AND tipo_servicio = 'Ajuste y Lubricación de Cadena' ORDER BY fecha_servicio DESC LIMIT 1"
                 cursor.execute(sql_cadena, (moto['id_moto'],))
                 ultima_cadena = cursor.fetchone()
@@ -148,7 +139,7 @@ def dashboard():
     else:
         flash('Por favor, inicia sesión primero.', 'error')
         return redirect(url_for('inicio'))
-# --- RUTA: REGISTRAR NUEVA MOTO ---
+
 # --- RUTA: REGISTRAR NUEVA MOTO ---
 @app.route('/nueva_moto', methods=['GET', 'POST'])
 def nueva_moto():
@@ -164,31 +155,24 @@ def nueva_moto():
         kilometraje = request.form['kilometraje_actual']
         id_usuario = session['id_usuario']
 
-        # --- NUEVA LÓGICA DE FOTOGRAFÍAS ---
         foto = request.files.get('foto')
-        nombre_archivo = 'default.png' # Si el usuario no sube nada, usamos este valor
+        nombre_archivo = 'default.png'
 
-        # Si viene un archivo y el nombre no está vacío
         if foto and foto.filename != '':
             if allowed_file(foto.filename):
-                # Extraemos la extensión (ej. .jpg) y generamos un código único con uuid
                 extension = foto.filename.rsplit('.', 1)[1].lower()
                 nombre_archivo = f"{uuid.uuid4().hex}.{extension}"
-                
-                # Guardamos el archivo físicamente en la carpeta 'static/uploads'
                 ruta_guardado = os.path.join(app.config['UPLOAD_FOLDER'], nombre_archivo)
                 foto.save(ruta_guardado)
             else:
                 flash('Formato de imagen no permitido. Usa JPG, PNG o WEBP.', 'error')
                 return redirect(request.url)
-        # -----------------------------------
 
         conexion = None
         try:
             conexion = mysql.connector.connect(**DB_CONFIG)
             cursor = conexion.cursor()
 
-            # Añadimos 'foto_url' a nuestra consulta SQL
             sql = """
             INSERT INTO motocicletas (id_usuario, marca, modelo, anio, cilindrada, kilometraje_actual, foto_url) 
             VALUES (%s, %s, %s, %s, %s, %s, %s)
